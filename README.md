@@ -11,7 +11,7 @@ First : download解壓縮放在./data/
 
 And Then : 用preprocessing裡的code去做pnet、rnet、onet的training data
 
-Note:生的data要大概控在 pos:part:neg = 1:1:3 , 不然model會always output no boxes (part、neg太多,大部分的時間都在compute neg bce跟box regression) , 多的data從txt檔delete就可以了
+Note : 生的data要大概控在 pos:part:neg = 1:1:3 , 不然model會always output no boxes (part、neg太多,大部分的時間都在compute neg bce跟box regression) , 多的data從txt檔delete就可以了
 
 
 ### PNet Output Result
