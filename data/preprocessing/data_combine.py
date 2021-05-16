@@ -2,6 +2,8 @@ import sys
 import os
 
 save_dir = "12"
+#save_dir = ""
+#save_dir = "48"
 if not os.path.exists(save_dir):
     os.mkdir(save_dir)
 f1 = open(os.path.join(save_dir, 'pos_%s.txt'%(save_dir)), 'r')
