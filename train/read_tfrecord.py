@@ -1,6 +1,14 @@
 import tensorflow as tf
 
 
+#img training trick
+def image_color_distort(inputs):
+    inputs = tf.image.random_contrast(inputs, lower=0.5, upper=1.5)
+    inputs = tf.image.random_brightness(inputs, max_delta=0.2)
+    inputs = tf.image.random_hue(inputs,max_delta= 0.2)
+    inputs = tf.image.random_saturation(inputs,lower = 0.5, upper= 1.5)
+    return inputs
+
 def red_tf(imgs,net_size):
     print(11)
     raw_image_dataset = tf.data.TFRecordDataset(imgs).shuffle(1000)
