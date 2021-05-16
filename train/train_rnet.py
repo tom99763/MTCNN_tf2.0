@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras as keras
-from read_tfrecord import *
+from read_tfrecord import red_tf
 from loss_function import cls_ohem,bbox_ohem
 from model import Rnet
 from tqdm import tqdm
@@ -40,9 +40,6 @@ def train(eopch):
     for epoch in tqdm(range(eopch)):
 
         for i,(img,lab,boxes) in enumerate(ds_train):
-            
-            img = image_color_distort(img)
-
 
             with tf.GradientTape() as tape:
                 cls_prob, bbox_pred = model(img)
