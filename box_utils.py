@@ -70,7 +70,7 @@ def get_image_boxes(bboxes, img, height, width, num_boxes, size=24):
     y1 = tf.math.maximum(bboxes[:, 1], 0.0) / height
     x2 = tf.math.minimum(bboxes[:, 2], width) / width
     y2 = tf.math.minimum(bboxes[:, 3], height) / height
-    boxes = tf.stack([y1, x1, y2, x2], 1)
+    boxes = tf.stack([y1, x1, y2, x2], 1) #see https://www.tensorflow.org/api_docs/python/tf/image/crop_and_resize
     img_boxes = tf.image.crop_and_resize(tf.expand_dims(img, 0), boxes,
                                          tf.zeros(num_boxes, dtype=tf.int32),
                                          (size, size))
