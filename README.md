@@ -34,9 +34,9 @@
 
 
 ### PNet Output Result
-![PNet_output_boxes](./test_imgs/result_pnet.jpg)
+![PNet_output_boxes](./test_imgs/)
 
 
 ### RNet Output Result
 
-![RNet_output_boxes](./test_imgs/result_rnet.jpg)
+![RNet_output_boxes](./test_imgs/)
