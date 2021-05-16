@@ -113,8 +113,13 @@ class MTCNN(object):
         img_boxes = get_image_boxes(bboxes, img, height, width, num_boxes, size=24)
         probs, offsets = self.rnet(img_boxes)
         valid_idx = tf.argmax(probs, axis=-1) == 1
+        
 
         bboxes = tf.boolean_mask(bboxes, valid_idx)
+        
+        if bboxes.shape[0]==0:
+            return bboxes
+        
         offsets = tf.boolean_mask(offsets, valid_idx)
         scores = tf.boolean_mask(probs[:, 1], valid_idx)
         bboxes = calibrate_box(bboxes, offsets)
