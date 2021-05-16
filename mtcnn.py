@@ -5,13 +5,14 @@ from box_utils import calibrate_box, convert_to_square, get_image_boxes, generat
 
 
 class MTCNN(object):
-    def __init__(self, pnet_path, rnet_path=None, onet_path=None,
+    def __init__(self, pnet_path=None, rnet_path=None, onet_path=None,
                  min_face_size=20.0,
                  thresholds= [0.7, 0.8, 0.9],
                  nms_thresholds=[0.6, 0.6, 0.6],
                  max_output_size=300):
         self.pnet = Pnet()
-        self.pnet.load_weights(pnet_path)
+        if self.pnet_path:
+            self.pnet.load_weights(pnet_path)
         #self.rnet = RNet(rnet_path)
         #self.onet = ONet(onet_path)
         self.min_face_size = min_face_size
