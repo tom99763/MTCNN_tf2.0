@@ -126,13 +126,5 @@ def generate_bboxes(probs, offsets, scale, threshold):
 
 
 def preprocess(img):
-    """Preprocess image tensor before applying a network.
-
-    Parameters:
-        img: image tensor
-
-    Returns:
-        float tensor with shape of img
-    """
     img = (img - 127.5) * 0.0078125
     return img
