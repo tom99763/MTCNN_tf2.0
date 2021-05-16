@@ -25,6 +25,7 @@ class MTCNN(object):
 
     def __call__(self, img):
         bboxes = self.p_step(img)
+        bboxes = self.r_step(img,bboxes)
         return bboxes
 
 
@@ -101,6 +102,27 @@ class MTCNN(object):
             return []
 
         return self.p_step_box_alignment(boxes)
+    
+     def r_step(self, img, bboxes):
+            
+        img=preprocess(img)
+        
+        height,width,_=img.shape
+        
+        num_boxes=bboxes.shape[0]
+        
+        img_boxes = get_image_boxes(bboxes, img, height, width, num_boxes, size=24)
+        probs, offsets = self.rnet(img_boxes)
+        valid_idx = tf.where(probs[:, 1] > self.thresholds[1])[:, 0]
+        bboxes = tf.gather(bboxes, valid_idx)
+        offsets = tf.gather(offsets, valid_idx)
+        scores = tf.gather(probs[:, 1], valid_idx)
+        bboxes = calibrate_box(bboxes, offsets)
+        bboxes = convert_to_square(bboxes)
+        nms_idx = tf.image.non_max_suppression(bboxes, scores,
+                                            self.max_output_size, self.nms_thresholds[1])
+        bboxes = tf.gather(bboxes, nms_idx)
+        return bboxes
 
 
 
