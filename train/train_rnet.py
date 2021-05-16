@@ -7,8 +7,8 @@ from tqdm import tqdm
 import os
 
 data_path = "../data/preprocessing/24/train_RNet_landmark.tfrecord_shuffle"
-batch_size = 128
-lr=1e-3
+batch_size = 64
+lr=1e-4
 model_save=None
 
 def load_ds():
@@ -56,5 +56,5 @@ def train(eopch):
 
     model.save_weights('./Weights/rnet_weights_file/rnet_weights')
 
-train(10)
+train(20)
 
