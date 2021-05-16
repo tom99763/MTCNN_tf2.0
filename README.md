@@ -7,7 +7,7 @@ WiderFace : http://shuoyang1213.me/WIDERFACE/
 
 FaceLandmarks : http://mmlab.ie.cuhk.edu.hk/archive/CNN_FacePoint.htm
 
-First : download解壓縮放在data file裡
+First : download解壓縮放在./data/
 
 And Then : 用preprocessing裡的code去做pnet、rnet、onet的training data
 
