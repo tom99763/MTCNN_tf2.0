@@ -25,7 +25,14 @@ class MTCNN(object):
 
     def __call__(self, img):
         bboxes = self.p_step(img)
+
+        if bboxes.shape[0] == 0:
+            return []
         bboxes = self.r_step(img,bboxes)
+
+        if bboxes.shape[0] == 0:
+            return []
+        
         return bboxes
 
 
