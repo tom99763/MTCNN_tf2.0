@@ -54,8 +54,6 @@ def train(eopch):
 
                 bbox_pred = tf.squeeze(bbox_pred,[1,2]) #(batch,1,1,4) to (batch,4)
                 bbox_loss = bbox_ohem(bbox_pred, boxes,lab)
-                # landmark_loss = landmark_loss_fn(landmark_pred, landmark_batch, label_batch)
-                # accuracy = cal_accuracy(cls_prob, label_batch)
 
                 total_loss_value = cls_loss + 0.5 * bbox_loss
             grads = tape.gradient(total_loss_value, model.trainable_variables)
