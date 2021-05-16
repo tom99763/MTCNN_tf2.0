@@ -56,7 +56,7 @@ def train(eopch):
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
             if i % 200 == 0:
                 print('Training loss (for one batch) at step %s: %s' % (i, float(total_loss_value)))
-                print('Seen so far: %s samples' % ((i + 1) * 6))
+                print('Seen : %s samples' % ((i + 1) * 6))
 
     model.save_weights('./Weights/pnet_weights_file/pnet_weights')
 
