@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras as keras
-from read_tfrecord import *
+from read_tfrecord import red_tf
 from loss_function import cls_ohem,bbox_ohem
 from model import Pnet
 from tqdm import tqdm
