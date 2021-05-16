@@ -89,8 +89,6 @@ def generate_bboxes(probs, offsets, scale, threshold):
     Returns:
         float tensor of shape [n, 9]
     """
-    # applying P-Net is equivalent, in some sense, to
-    # moving 12x12 window with stride 2
     stride = 2
     cell_size = 12
 
