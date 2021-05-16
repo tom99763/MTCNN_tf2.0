@@ -7,7 +7,7 @@ from tqdm import tqdm
 import os
 
 data_path = "../data/preprocessing/24/train_RNet_landmark.tfrecord_shuffle"
-batch_size = 64
+batch_size = 128
 lr=1e-4
 model_save=None
 
