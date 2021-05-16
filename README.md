@@ -33,10 +33,3 @@
     * Note : 我只train了 100000:100000:300000個data, 因為我的computer受不了
 
 
-### PNet Output Result
-![PNet_output_boxes](./test_imgs/result_pnet.jpg)
-
-
-### RNet Output Result
-
-![RNet_output_boxes](./test_imgs/result_rnet.jpg)
