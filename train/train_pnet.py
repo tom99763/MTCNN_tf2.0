@@ -40,12 +40,9 @@ def train(eopch):
     off = 1000
     acc_meter = metrics.Accuracy()
     ds_train=load_ds("train")
-    #ds_val=load_pokemon("val")
     for epoch in tqdm(range(eopch)):
 
         for i,(img,lab,boxes) in enumerate(ds_train):
-
-            #img = image_color_distort(img)
 
             with tf.GradientTape() as tape:
                 cls_prob, bbox_pred = model(img)
