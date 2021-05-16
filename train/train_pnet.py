@@ -40,6 +40,8 @@ def train(eopch):
     for epoch in tqdm(range(eopch)):
 
         for i,(img,lab,boxes) in enumerate(ds_train):
+            
+            img = image_color_distort(img)
 
             with tf.GradientTape() as tape:
                 cls_prob, bbox_pred = model(img)
