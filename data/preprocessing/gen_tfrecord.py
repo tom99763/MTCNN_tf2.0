@@ -150,10 +150,10 @@ def get_dataset(dir):
     # print(dataset_dir)
     imagelist = open(dataset_dir, 'r')
 
-    dataset = []  # 新建列表
+    dataset = []  
     for line in imagelist.readlines():
         info = line.strip().split(' ')
-        data_example = dict()  # 新建字典
+        data_example = dict() 
         bbox = dict()
         data_example['filename'] = info[0]  # filename=info[0]
         # print(data_example['filename'])
