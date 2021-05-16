@@ -1,40 +1,40 @@
-from train.model import Pnet,Rnet,Onet
+from train.model import Pnet, Rnet, Onet
 import tensorflow as tf
 from box_utils import calibrate_box, convert_to_square, get_image_boxes, generate_bboxes, preprocess
-
 
 
 class MTCNN(object):
     def __init__(self, pnet_path=None, rnet_path=None, onet_path=None,
                  min_face_size=20.0,
-                 thresholds= [0.5, 0.5, 0.5],
+                 thresholds=[0.7, 0.5, 0.5],
                  nms_thresholds=[0.6, 0.6, 0.6],
                  max_nms_output_num=300,
-                 scale_factor=0.707):  #0.707 is empirical, no theory proof
+                 scale_factor=0.707):  # 0.707 is empirical, no theory proof
         self.pnet = Pnet()
-        if self.pnet_path:
+        if pnet_path:
             self.pnet.load_weights(pnet_path)
-        #self.rnet = RNet(rnet_path)
-        #self.onet = ONet(onet_path)
+        self.rnet = Rnet()
+        if rnet_path:
+            self.rnet.load_weights(rnet_path)
+        # self.onet = ONet(onet_path)
         self.min_face_size = min_face_size
         self.thresholds = thresholds
         self.nms_thresholds = nms_thresholds
         self.max_nms_output_num = max_nms_output_num
         self.scale_cache = {}
-        self.scale_factor=scale_facotr
+        self.scale_factor = scale_factor
 
     def __call__(self, img):
         bboxes = self.p_step(img)
 
         if bboxes.shape[0] == 0:
             return []
-        bboxes = self.r_step(img,bboxes)
+        bboxes = self.r_step(img, bboxes)
 
         if bboxes.shape[0] == 0:
             return []
-        
-        return bboxes
 
+        return bboxes
 
     def build_scale_pyrammid(self, height, width):
         min_length = min(height, width)
@@ -49,14 +49,12 @@ class MTCNN(object):
         min_length *= m
         factor_count = 0
         while min_length > min_detection_size:
-            scales.append(m * self.scale_factor**factor_count)
+            scales.append(m * self.scale_factor ** factor_count)
             min_length *= self.scale_factor
             factor_count += 1
 
         self.scale_cache[min_length] = scales
         return scales
-
-
 
     @tf.function(
         input_signature=[tf.TensorSpec(shape=(None, None, 3), dtype=tf.float32),
@@ -79,7 +77,6 @@ class MTCNN(object):
         boxes = tf.gather(boxes, keep)
         return boxes
 
-
     @tf.function(
         input_signature=[tf.TensorSpec(shape=(None, 9), dtype=tf.float32)])
     def p_step_box_alignment(self, boxes):
@@ -88,13 +85,12 @@ class MTCNN(object):
         bboxes = convert_to_square(bboxes)
 
         nms_idx = tf.image.non_max_suppression(bboxes, scores, self.max_nms_output_num,
-                                            iou_threshold=self.nms_thresholds[0])
+                                               iou_threshold=self.nms_thresholds[0])
         bboxes = tf.gather(bboxes, nms_idx)
         return bboxes
 
-
     def p_step(self, img):
-        img=preprocess(img)
+        img = preprocess(img)
         height, width, _ = img.shape
 
         img = tf.convert_to_tensor(img, tf.float32)
@@ -109,30 +105,21 @@ class MTCNN(object):
             return []
 
         return self.p_step_box_alignment(boxes)
-    
+
     def r_step(self, img, bboxes):
-        img=preprocess(img)
-        height,width,_=img.shape
-        num_boxes=bboxes.shape[0]
+        img = preprocess(img)
+        height, width, _ = img.shape
+        num_boxes = bboxes.shape[0]
         img_boxes = get_image_boxes(bboxes, img, height, width, num_boxes, size=24)
         probs, offsets = self.rnet(img_boxes)
-        valid_idx =tf.argmax(probs,axis=-1)==1
-        
-        bboxes = tf.boolean_mask(bboxes,valid_idx)
-        offsets = tf.boolean_mask(offsets,valid_idx)
-        scores = tf.boolean_mask(probs[:,1],valid_idx)
+        valid_idx = tf.argmax(probs, axis=-1) == 1
+
+        bboxes = tf.boolean_mask(bboxes, valid_idx)
+        offsets = tf.boolean_mask(offsets, valid_idx)
+        scores = tf.boolean_mask(probs[:, 1], valid_idx)
         bboxes = calibrate_box(bboxes, offsets)
         bboxes = convert_to_square(bboxes)
         nms_idx = tf.image.non_max_suppression(bboxes, scores,
-                                            self.max_output_size, self.nms_thresholds[1])
+                                               self.max_nms_output_num, self.nms_thresholds[1])
         bboxes = tf.gather(bboxes, nms_idx)
         return bboxes
-
-
-
-
-'''
-mtcnn=MTCNN()
-x=tf.random.normal((32,32,3))
-mtcnn(x)
-'''
