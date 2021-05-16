@@ -87,9 +87,9 @@ class MTCNN(object):
         bboxes = calibrate_box(bboxes, offsets)
         bboxes = convert_to_square(bboxes)
 
-        keep = tf.image.non_max_suppression(bboxes, scores, self.max_nms_output_num,
+        nms_idx = tf.image.non_max_suppression(bboxes, scores, self.max_nms_output_num,
                                             iou_threshold=self.nms_thresholds[0])
-        bboxes = tf.gather(bboxes, keep)
+        bboxes = tf.gather(bboxes, nms_idx)
         return bboxes
 
 
@@ -110,20 +110,17 @@ class MTCNN(object):
 
         return self.p_step_box_alignment(boxes)
     
-     def r_step(self, img, bboxes):
-            
+    def r_step(self, img, bboxes):
         img=preprocess(img)
-        
         height,width,_=img.shape
-        
         num_boxes=bboxes.shape[0]
-        
         img_boxes = get_image_boxes(bboxes, img, height, width, num_boxes, size=24)
         probs, offsets = self.rnet(img_boxes)
-        valid_idx = tf.where(probs[:, 1] > self.thresholds[1])[:, 0]
-        bboxes = tf.gather(bboxes, valid_idx)
-        offsets = tf.gather(offsets, valid_idx)
-        scores = tf.gather(probs[:, 1], valid_idx)
+        valid_idx =tf.argmax(probs,axis=-1)==1
+        
+        bboxes = tf.boolean_mask(bboxes,valid_idx)
+        offsets = tf.boolean_mask(offsets,valid_idx)
+        scores = tf.boolean_mask(probs[:,1],valid_idx)
         bboxes = calibrate_box(bboxes, offsets)
         bboxes = convert_to_square(bboxes)
         nms_idx = tf.image.non_max_suppression(bboxes, scores,
