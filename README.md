@@ -26,7 +26,7 @@
 
 * Note : 生的data要大概控在 pos:part:neg = 1:1:3 , 不然model會always output no boxes (part、neg太多,大部分的時間都在compute neg bce跟box regression) , 多的data從txt檔delete就可以了
 
-* Note : 我的Weight是只train 100000:100000:300000的data 的model
+* Note : 我只了train 100000:100000:300000個data, 因為我的computer受不了
 
 
 ### PNet Output Result
