@@ -9,7 +9,8 @@ class MTCNN(object):
                  min_face_size=20.0,
                  thresholds= [0.7, 0.8, 0.9],
                  nms_thresholds=[0.6, 0.6, 0.6],
-                 max_output_size=300):
+                 max_output_size=300,
+                 scale_factor=0.707):  #0.707 is empirical, no theory proof
         self.pnet = Pnet()
         if self.pnet_path:
             self.pnet.load_weights(pnet_path)
@@ -20,6 +21,7 @@ class MTCNN(object):
         self.nms_thresholds = nms_thresholds
         self.max_output_size = max_output_size
         self.scale_cache = {}
+        self.scale_factor=scale_facotr
 
     def __call__(self, img):
         bboxes = self.p_step(img)
@@ -33,15 +35,14 @@ class MTCNN(object):
             return self.scale_cache[min_length]
 
         min_detection_size = 12
-        factor = 0.707  # sqrt(0.5)
         scales = []
 
         m = min_detection_size / self.min_face_size
         min_length *= m
         factor_count = 0
         while min_length > min_detection_size:
-            scales.append(m * factor**factor_count)
-            min_length *= factor
+            scales.append(m * self.scale_factor**factor_count)
+            min_length *= self.scale_factor
             factor_count += 1
 
         self.scale_cache[min_length] = scales
