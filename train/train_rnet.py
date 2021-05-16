@@ -1,6 +1,5 @@
 import tensorflow as tf
 import tensorflow.keras as keras
-from tensorflow.keras import metrics
 from read_tfrecord import *
 from loss_function import cls_ohem,bbox_ohem
 from model import Rnet
@@ -37,15 +36,11 @@ def train(eopch):
         model.load_weights(model_save)
 
     optimizer = keras.optimizers.Adam(learning_rate=lr)
-    off = 1000
-    acc_meter = metrics.Accuracy()
     ds_train=load_ds("train")
-    #ds_val=load_pokemon("val")
     for epoch in tqdm(range(eopch)):
 
         for i,(img,lab,boxes) in enumerate(ds_train):
 
-            #img = image_color_distort(img)
 
             with tf.GradientTape() as tape:
                 cls_prob, bbox_pred = model(img)
