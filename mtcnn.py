@@ -9,7 +9,7 @@ class MTCNN(object):
                  min_face_size=20.0,
                  thresholds= [0.7, 0.8, 0.9],
                  nms_thresholds=[0.6, 0.6, 0.6],
-                 max_output_size=300,
+                 max_nms_output_num=300,
                  scale_factor=0.707):  #0.707 is empirical, no theory proof
         self.pnet = Pnet()
         if self.pnet_path:
@@ -19,7 +19,7 @@ class MTCNN(object):
         self.min_face_size = min_face_size
         self.thresholds = thresholds
         self.nms_thresholds = nms_thresholds
-        self.max_output_size = max_output_size
+        self.max_nms_output_num = max_nms_output_num
         self.scale_cache = {}
         self.scale_factor=scale_facotr
 
@@ -65,7 +65,7 @@ class MTCNN(object):
         boxes = generate_bboxes(probs[0], offsets[0], scale, self.thresholds[0])
         if len(boxes) == 0:
             return boxes
-        keep = tf.image.non_max_suppression(boxes[:, 0:4], boxes[:, 4], self.max_output_size,
+        keep = tf.image.non_max_suppression(boxes[:, 0:4], boxes[:, 4], self.max_nms_output_num,
                                             iou_threshold=0.5)
 
         boxes = tf.gather(boxes, keep)
@@ -79,7 +79,7 @@ class MTCNN(object):
         bboxes = calibrate_box(bboxes, offsets)
         bboxes = convert_to_square(bboxes)
 
-        keep = tf.image.non_max_suppression(bboxes, scores, self.max_output_size,
+        keep = tf.image.non_max_suppression(bboxes, scores, self.max_nms_output_num,
                                             iou_threshold=self.nms_thresholds[0])
         bboxes = tf.gather(bboxes, keep)
         return bboxes
