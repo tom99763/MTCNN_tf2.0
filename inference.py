@@ -14,8 +14,8 @@ pnet_weights_path='./train/Weights/pnet_weights_file/pnet_weights'
 
 mtcnn=MTCNN(pnet_path=pnet_weights_path)
 
-img=cv2.imread('test.jpg')
+img=cv2.imread('./test_imgs/test.jpg')
 boxes=mtcnn(img)
 
 img = draw_faces(img, boxes, None, None)
-cv2.imwrite('result_rnet.jpg', img)
+cv2.imwrite('./test_imgs/result_rnet.jpg', img)
