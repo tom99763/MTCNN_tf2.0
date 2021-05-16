@@ -18,4 +18,4 @@ img=cv2.imread('./test_imgs/test.jpg')
 boxes=mtcnn(img)
 
 img = draw_faces(img, boxes, None)
-cv2.imwrite('./test_imgs/result_rnet.jpg', img)
+cv2.imwrite('./test_imgs/result.jpg', img)
