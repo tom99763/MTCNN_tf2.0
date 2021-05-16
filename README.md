@@ -1,5 +1,16 @@
 # MTCNN_tf2.0
 
+* implement paper : 
+     
+    * multi-task cnn : https://arxiv.org/abs/1604.02878
+
+* related paper : 
+
+    * prelu : https://arxiv.org/abs/1502.01852
+    
+    * cnn cascade structure : https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Li_A_Convolutional_Neural_2015_CVPR_paper.pdf
+
+
 ### Dataset
 
 
