@@ -11,7 +11,7 @@ batch_size = 64
 lr=1e-4
 model_save=None
 
-def load_ds(mode='train'):
+def load_ds():
 
     size = 12
     print(1)
@@ -36,7 +36,7 @@ def train(eopch):
         model.load_weights(model_save)
 
     optimizer = keras.optimizers.Adam(learning_rate=lr)
-    ds_train=load_ds("train")
+    ds_train=load_ds()
     for epoch in tqdm(range(eopch)):
 
         for i,(img,lab,boxes) in enumerate(ds_train):
