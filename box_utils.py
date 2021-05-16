@@ -126,5 +126,5 @@ def generate_bboxes(probs, offsets, scale, threshold):
 
 
 def preprocess(img):
-    img = (img - 127.5) * 0.0078125
+    img = (img - 127.5) * (1./127.5)
     return img
