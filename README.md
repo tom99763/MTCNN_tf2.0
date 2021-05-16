@@ -39,4 +39,4 @@
 
 ### RNet Output Result
 
-![RNet_output_boxes](./test_imgs/)
+![RNet_output_boxes](./test_imgs/result_rnet.jpg)
