@@ -74,7 +74,6 @@ def get_image_boxes(bboxes, img, height, width, num_boxes, size=24):
     img_boxes = tf.image.crop_and_resize(tf.expand_dims(img, 0), boxes,
                                          tf.zeros(num_boxes, dtype=tf.int32),
                                          (size, size))
-    img_boxes = preprocess(img_boxes)
     return img_boxes
 
 
