@@ -49,10 +49,8 @@ def train(eopch):
 
             with tf.GradientTape() as tape:
                 cls_prob, bbox_pred = model(img)
-                cls_prob = tf.squeeze(cls_prob,[1,2]) #(batch,1,1,2) to (batch,2)
                 cls_loss = cls_ohem(cls_prob, lab)
 
-                bbox_pred = tf.squeeze(bbox_pred,[1,2]) #(batch,1,1,4) to (batch,4)
                 bbox_loss = bbox_ohem(bbox_pred, boxes,lab)
                 # landmark_loss = landmark_loss_fn(landmark_pred, landmark_batch, label_batch)
                 # accuracy = cal_accuracy(cls_prob, label_batch)
