@@ -28,7 +28,7 @@
 
     * Pnet生的data要大概控在 pos:part:neg = 1:1:3 , 不然model會always output no boxes (part、neg太多,大部分的時間都在compute neg bce跟box regression) , 多的data從txt檔delete就可以了
     
-    * RNet跟ONet遵守imbalance data的控制就好了
+    * RNet跟ONet遵守imbalance data的控制就好了(pos:neg = 1:1)
     
     * Note : 我只train了 100000:100000:300000個data, 因為我的computer受不了
 
