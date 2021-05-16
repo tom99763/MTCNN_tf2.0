@@ -16,16 +16,14 @@ def IoU(pr_box, boxes):
     ovr: numpy.array, shape (n, )
         IoU
     """
-    # print("随机锚框:",pr_box)
+
 
     box_area = (pr_box[2] - pr_box[0] + 1) * (pr_box[3] - pr_box[1] + 1)
-    # print("随机面积box_area:",box_area)
-    # print("(boxes[:, 2] - boxes[:, 0] + 1):",(boxes[:, 2] - boxes[:, 0] + 1))
-    #XML真实区域 X2-X1 +1 = W   Y2-Y1 = H   W*H
+
+
     area = (boxes[:, 2] - boxes[:, 0] + 1) * (boxes[:, 3] - boxes[:, 1] + 1)
-    # print("真实面积area:",area)
-    # print("probx[0]",pr_box[0])
-    # boxes[:, 0]代表取boxes这个nx4矩阵所有行的第一列数据
+
+
     xx1 = np.maximum(pr_box[0], boxes[:, 0])
     # print("xx1",xx1)
     yy1 = np.maximum(pr_box[1], boxes[:, 1])
