@@ -199,4 +199,14 @@ if __name__ == '__main__':
     dir = '12'
     net = 'PNet'
     output_directory = '12'
+    '''
+    dir = '24'
+    net = 'RNet'
+    output_directory = '24'
+    
+    
+    dir = '48'
+    net = 'ONet'
+    output_directory = '48'
+    '''
     run(dir,net,output_directory,shuffling=True)
