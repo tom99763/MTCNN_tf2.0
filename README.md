@@ -24,9 +24,11 @@
 
 * And Then : 用preprocessing裡的code去做pnet、rnet、onet的training data
 
-* Note : 生的data要大概控在 pos:part:neg = 1:1:3 , 不然model會always output no boxes (part、neg太多,大部分的時間都在compute neg bce跟box regression) , 多的data從txt檔delete就可以了
+* Note : 
 
-* Note : 我只了train 100000:100000:300000個data, 因為我的computer受不了
+    * 生的data要大概控在 pos:part:neg = 1:1:3 , 不然model會always output no boxes (part、neg太多,大部分的時間都在compute neg bce跟box regression) , 多的data從txt檔delete就可以了
+    
+    * Note : 我只train了 100000:100000:300000個data, 因為我的computer受不了
 
 
 ### PNet Output Result
