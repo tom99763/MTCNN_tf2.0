@@ -36,25 +36,19 @@ class MTCNN(object):
 
         return bboxes
 
-    def build_scale_pyrammid(self, height, width):
+    def build_scale_pyramid(self,img,height,width):
+        boxes = []
         min_length = min(height, width)
-
-        if min_length in self.scale_cache:
-            return self.scale_cache[min_length]
-
         min_detection_size = 12
-        scales = []
-
         m = min_detection_size / self.min_face_size
         min_length *= m
         factor_count = 0
         while min_length > min_detection_size:
-            scales.append(m * self.scale_factor ** factor_count)
+            scale = m * self.scale_factor ** factor_count
             min_length *= self.scale_factor
             factor_count += 1
-
-        self.scale_cache[min_length] = scales
-        return scales
+            boxes.append(self.scale_search(img, height, width, scale))
+        return boxes
 
     @tf.function(
         input_signature=[tf.TensorSpec(shape=(None, None, 3), dtype=tf.float32),
@@ -92,18 +86,12 @@ class MTCNN(object):
     def p_step(self, img):
         img = preprocess(img)
         height, width, _ = img.shape
-
         img = tf.convert_to_tensor(img, tf.float32)
-        scales = self.build_scale_pyrammid(height, width)
 
-        boxes = []
-        for s in scales:
-            boxes.append(self.scale_search(img, height, width, s))
+        boxes = self.build_scale_pyramid(img,height, width)
         boxes = tf.concat(boxes, 0)
-
         if boxes.shape[0] == 0:
             return []
-
         return self.p_step_box_alignment(boxes)
 
     def r_step(self, img, bboxes):
@@ -113,13 +101,12 @@ class MTCNN(object):
         img_boxes = get_image_boxes(bboxes, img, height, width, num_boxes, size=24)
         probs, offsets = self.rnet(img_boxes)
         valid_idx = tf.argmax(probs, axis=-1) == 1
-        
 
         bboxes = tf.boolean_mask(bboxes, valid_idx)
-        
-        if bboxes.shape[0]==0:
+
+        if bboxes.shape[0] == 0:
             return bboxes
-        
+
         offsets = tf.boolean_mask(offsets, valid_idx)
         scores = tf.boolean_mask(probs[:, 1], valid_idx)
         bboxes = calibrate_box(bboxes, offsets)
