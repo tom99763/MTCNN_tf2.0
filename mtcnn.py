@@ -21,7 +21,6 @@ class MTCNN(object):
         self.thresholds = thresholds
         self.nms_thresholds = nms_thresholds
         self.max_nms_output_num = max_nms_output_num
-        self.scale_cache = {}
         self.scale_factor = scale_factor
 
     def __call__(self, img):
@@ -67,14 +66,14 @@ class MTCNN(object):
             return boxes
         keep = tf.image.non_max_suppression(boxes[:, 0:4], boxes[:, 4], self.max_nms_output_num,
                                             iou_threshold=0.5)
-
         boxes = tf.gather(boxes, keep)
         return boxes
 
     @tf.function(
-        input_signature=[tf.TensorSpec(shape=(None, 9), dtype=tf.float32)])
-    def p_step_box_alignment(self, boxes):
-        bboxes, scores, offsets = boxes[:, :4], boxes[:, 4], boxes[:, 5:]
+        input_signature=[tf.TensorSpec(shape=(None, 4), dtype=tf.float32),
+                         tf.TensorSpec(shape=(None,),dtype=tf.float32),
+                         tf.TensorSpec(shape=(None,4),dtype=tf.float32)])
+    def bbox_alignment(self, bboxes,scores,offsets):
         bboxes = calibrate_box(bboxes, offsets)
         bboxes = convert_to_square(bboxes)
 
@@ -92,7 +91,9 @@ class MTCNN(object):
         boxes = tf.concat(boxes, 0)
         if boxes.shape[0] == 0:
             return []
-        return self.p_step_box_alignment(boxes)
+        bboxes, scores, offsets = boxes[:, :4], boxes[:, 4], boxes[:, 5:]
+        return self.bbox_alignment(bboxes,scores,offsets)
+
 
     def r_step(self, img, bboxes):
         img = preprocess(img)
@@ -109,9 +110,5 @@ class MTCNN(object):
 
         offsets = tf.boolean_mask(offsets, valid_idx)
         scores = tf.boolean_mask(probs[:, 1], valid_idx)
-        bboxes = calibrate_box(bboxes, offsets)
-        bboxes = convert_to_square(bboxes)
-        nms_idx = tf.image.non_max_suppression(bboxes, scores,
-                                               self.max_nms_output_num, self.nms_thresholds[1])
-        bboxes = tf.gather(bboxes, nms_idx)
-        return bboxes
+
+        return self.bbox_alignment(bboxes,scores,offsets)
