@@ -41,4 +41,4 @@
 
 ### RNet Output Result
 
-![RNet_output_boxes](./test_imgs/result_rnet.jpg)
+![RNet_output_boxes](./test_imgs/gsw3_result.jpg)
