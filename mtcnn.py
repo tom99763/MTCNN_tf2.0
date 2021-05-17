@@ -6,8 +6,8 @@ from box_utils import calibrate_box, convert_to_square, get_image_boxes, generat
 class MTCNN(object):
     def __init__(self, pnet_path=None, rnet_path=None, onet_path=None,
                  min_face_size=20.0,
-                 thresholds=[0.7, 0.5, 0.5],
-                 nms_thresholds=[0.6, 0.6, 0.6],
+                 thresholds=[0.6, 0.8, 0.9],
+                 nms_thresholds=[0.6, 0.4, 0.1],
                  max_nms_output_num=300,
                  scale_factor=0.707):  # 0.707 is empirical, no theory proof
         self.pnet = Pnet()
