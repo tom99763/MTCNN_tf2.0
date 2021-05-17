@@ -30,7 +30,7 @@
     
     * RNet跟ONet遵守imbalance data的控制就好了(pos:neg = 1:1) 
     
-    * 我自己的意見 : Train RNet不用一定要PNet的output
+    * 我自己的意見 : Train RNet不用一定要PNet的output,ONet也是
     
     * Note : 我只train了 100000:100000:300000個data, 因為我的computer受不了
 
