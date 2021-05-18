@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+#activation see tf intro :  https://www.tensorflow.org/api_docs/python/tf/keras/layers/PReLU
 
 def Pnet():
     input = tf.keras.Input(shape=[None, None, 3])
