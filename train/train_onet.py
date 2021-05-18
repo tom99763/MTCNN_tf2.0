@@ -8,7 +8,7 @@ from tqdm import tqdm
 data_path = "../data/preprocessing/48/train_ONet_landmark.tfrecord_shuffle"
 batch_size = 64
 lr=1e-4
-#model_save='./Weights/rnet_weights_file/rnet_weights'
+#model_save='./Weights/onet_weights_file/onet_weights'
 model_save=None
 epochs = 20
 
@@ -58,6 +58,6 @@ def train(eopch):
                 print('Training loss (for one batch) at step %s: %s' % (i, float(total_loss_value)))
                 print('Seen so far: %s samples' % ((i + 1) * 6))
 
-    model.save_weights('./Weights/rnet_weights_file/rnet_weights')
+    model.save_weights('./Weights/onet_weights_file/onet_weights')
 
 train(epochs)
