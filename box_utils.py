@@ -2,7 +2,7 @@ import tensorflow as tf
 
 
 def convert_to_square(bboxes):
-    """Convert bounding boxes to a square form.
+    """
 
     Parameters:
         bboxes: float tensor of shape [n, 4]
@@ -15,9 +15,7 @@ def convert_to_square(bboxes):
     w = x2 - x1
     max_side = tf.maximum(h, w)
 
-    '''
-    choose one size , recoordinate coord to the square
-    '''
+
     dx1 = x1 + w * 0.5 - max_side * 0.5
     dy1 = y1 + h * 0.5 - max_side * 0.5
     dx2 = dx1 + max_side
@@ -33,9 +31,7 @@ def convert_to_square(bboxes):
 
 
 def calibrate_box(bboxes, offsets):
-    """Use offsets returned by a network to
-    correct the bounding box coordinates.
-
+    """
     Parameters:
         bboxes: float tensor of shape [n, 4].
         offsets: float tensor of shape [n, 4].
@@ -53,7 +49,7 @@ def calibrate_box(bboxes, offsets):
 
 
 def get_image_boxes(bboxes, img, height, width, num_boxes, size=24):
-    """Cut out boxes from the image.
+    """
 
     Parameters:
         bboxes: float tensor of shape [n, 4]
@@ -78,8 +74,7 @@ def get_image_boxes(bboxes, img, height, width, num_boxes, size=24):
 
 
 def generate_bboxes(probs, offsets, scale, threshold):
-    """Convert output of PNet to bouding boxes tensor.
-
+    """
     Parameters:
         probs: float tensor of shape [p, m, 2], output of PNet
         offsets: float tensor of shape [p, m, 4], output of PNet
