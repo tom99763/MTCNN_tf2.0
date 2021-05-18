@@ -26,17 +26,17 @@ class MTCNN(object):
     def __call__(self, img):
         bboxes = self.p_step(img)
 
-        if bboxes.shape[0] == 0:
+        if len(bboxes)== 0:
             return []
         bboxes = self.r_step(img, bboxes)
 
-        if bboxes.shape[0] == 0:
+        if len(bboxes) == 0:
             return []
 
         return bboxes
 
     def build_scale_pyramid(self,img,height,width):
-        info = []
+        infos = []
         min_length = min(height, width)
         min_detection_size = 12
         m = min_detection_size / self.min_face_size
@@ -46,8 +46,8 @@ class MTCNN(object):
             scale = m * self.scale_factor ** factor_count
             min_length *= self.scale_factor
             factor_count += 1
-            info.append(self.scale_search(img, height, width, scale))
-        return info
+            infos.append(self.scale_search(img, height, width, scale))
+        return infos
 
     @tf.function(
         input_signature=[tf.TensorSpec(shape=(None, None, 3), dtype=tf.float32),
@@ -61,13 +61,13 @@ class MTCNN(object):
         img_in = tf.expand_dims(img_in, 0)
 
         probs, offsets = self.pnet(img_in)
-        boxes = generate_bboxes(probs[0], offsets[0], scale, self.thresholds[0])
-        if len(boxes) == 0:
-            return boxes
-        keep = tf.image.non_max_suppression(boxes[:, 0:4], boxes[:, 4], self.max_nms_output_num,
+        info = generate_bboxes(probs[0], offsets[0], scale, self.thresholds[0])
+        if info.shape[0] == 0:
+            return info
+        nms_idx = tf.image.non_max_suppression(info[:, 0:4], info[:, 4], self.max_nms_output_num,
                                             iou_threshold=0.5)
-        boxes = tf.gather(boxes, keep)
-        return boxes
+        info = tf.gather(info, nms_idx)
+        return info
 
     @tf.function(
         input_signature=[tf.TensorSpec(shape=(None, 4), dtype=tf.float32),
@@ -87,11 +87,13 @@ class MTCNN(object):
         height, width, _ = img.shape
         img = tf.convert_to_tensor(img, tf.float32)
 
-        info = self.build_scale_pyramid(img,height, width)
-        if len(info) == 0:
+        infos = self.build_scale_pyramid(img,height, width)
+        infos = tf.concat(infos, 0)
+
+        if infos.shape[0]==0:
             return []
-        info = tf.concat(info, 0)
-        bboxes, scores, offsets = info[:, :4], info[:, 4], info[:, 5:]
+
+        bboxes, scores, offsets = infos[:, :4], infos[:, 4], infos[:, 5:]
         return self.bbox_alignment(bboxes,scores,offsets)
 
 
@@ -105,8 +107,8 @@ class MTCNN(object):
 
         bboxes = tf.boolean_mask(bboxes, valid_idx)
 
-        if bboxes.shape[0] == 0:
-            return bboxes
+        if bboxes.shape[0]== 0:
+            return []
 
         offsets = tf.boolean_mask(offsets, valid_idx)
         scores = tf.boolean_mask(probs[:, 1], valid_idx)
