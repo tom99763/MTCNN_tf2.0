@@ -59,7 +59,7 @@ for annotation in annotations:
 
 
     image = cv2.imread(im_dir+im_path+'.jpg')
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
 
     pre_bboxes= model.p_step(image)
 
