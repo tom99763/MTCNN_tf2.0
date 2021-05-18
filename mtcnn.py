@@ -88,7 +88,7 @@ class MTCNN(object):
         img = tf.convert_to_tensor(img, tf.float32)
 
         info = self.build_scale_pyramid(img,height, width)
-        if info.shape[0] == 0:
+        if len(info) == 0:
             return []
         info = tf.concat(info, 0)
         bboxes, scores, offsets = info[:, :4], info[:, 4], info[:, 5:]
