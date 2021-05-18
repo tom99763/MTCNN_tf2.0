@@ -17,17 +17,17 @@ f = open(os.path.join(save_dir, 'label-train%s.txt'%(save_dir)), 'w')
 
 for i in range(int(len(pos))):
     p = pos[i].find(" ") + 1
-    pos[i] = pos[i][:p-1] + ".jpg " + pos[i][p:-1] + " -1 -1 -1 -1 -1 -1 -1 -1 -1 -1\n"
+    pos[i] = pos[i][:p-1] + ".jpg " + pos[i][p:-1] + "\n"
     f.write(pos[i])
 
 for i in range(int(len(neg))):
     p = neg[i].find(" ") + 1
-    neg[i] = neg[i][:p-1] + ".jpg " + neg[i][p:-1] + " -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1\n"
+    neg[i] = neg[i][:p-1] + ".jpg " + neg[i][p:-1] + " -1 -1 -1 -1\n"
     f.write(neg[i])
 
 for i in range(int(len(part))):
     p = part[i].find(" ") + 1
-    part[i] = part[i][:p-1] + ".jpg " + part[i][p:-1] + " -1 -1 -1 -1 -1 -1 -1 -1 -1 -1\n"
+    part[i] = part[i][:p-1] + ".jpg " + part[i][p:-1] + "\n"
     f.write(part[i])
 
 for i in range(int(len(landmark))):
