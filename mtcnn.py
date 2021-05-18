@@ -36,7 +36,7 @@ class MTCNN(object):
         return bboxes
 
     def build_scale_pyramid(self,img,height,width):
-        boxes = []
+        info = []
         min_length = min(height, width)
         min_detection_size = 12
         m = min_detection_size / self.min_face_size
@@ -46,8 +46,8 @@ class MTCNN(object):
             scale = m * self.scale_factor ** factor_count
             min_length *= self.scale_factor
             factor_count += 1
-            boxes.append(self.scale_search(img, height, width, scale))
-        return boxes
+            info.append(self.scale_search(img, height, width, scale))
+        return info
 
     @tf.function(
         input_signature=[tf.TensorSpec(shape=(None, None, 3), dtype=tf.float32),
@@ -87,11 +87,11 @@ class MTCNN(object):
         height, width, _ = img.shape
         img = tf.convert_to_tensor(img, tf.float32)
 
-        boxes = self.build_scale_pyramid(img,height, width)
-        boxes = tf.concat(boxes, 0)
-        if boxes.shape[0] == 0:
+        info = self.build_scale_pyramid(img,height, width)
+        if info.shape[0] == 0:
             return []
-        bboxes, scores, offsets = boxes[:, :4], boxes[:, 4], boxes[:, 5:]
+        info = tf.concat(info, 0)
+        bboxes, scores, offsets = info[:, :4], info[:, 4], info[:, 5:]
         return self.bbox_alignment(bboxes,scores,offsets)
 
 
