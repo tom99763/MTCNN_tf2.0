@@ -6,9 +6,9 @@ from box_utils import calibrate_box, convert_to_square, get_image_boxes, generat
 class MTCNN(object):
     def __init__(self, pnet_path=None, rnet_path=None, onet_path=None,
                  min_face_size=20.0,
-                 thresholds=[0.6, 0.8, 0.9],
-                 nms_thresholds=[0.6, 0.4, 0.1],
-                 max_nms_output_num=300,
+                 thresholds=[0.6, 0.6, 0.6],
+                 nms_thresholds=[0.6, 0.4, 0.2],
+                 max_nms_output_num=500,
                  scale_factor=0.707):  # 0.707 is empirical, no theory proof
         self.pnet = Pnet()
         if pnet_path:
@@ -16,7 +16,9 @@ class MTCNN(object):
         self.rnet = Rnet()
         if rnet_path:
             self.rnet.load_weights(rnet_path)
-        # self.onet = ONet(onet_path)
+        self.onet = Onet()
+        if onet_path:
+             self.onet.load_weights(onet_path)
         self.min_face_size = min_face_size
         self.thresholds = thresholds
         self.nms_thresholds = nms_thresholds
@@ -26,16 +28,22 @@ class MTCNN(object):
     def __call__(self, img):
         bboxes = self.p_step(img)
 
-        if len(bboxes)== 0:
+        if len(bboxes) == 0:
             return []
         bboxes = self.r_step(img, bboxes)
 
         if len(bboxes) == 0:
             return []
 
-        return bboxes
+        bboxes,landmarks,scores = self.o_step(img,bboxes)
 
-    def build_scale_pyramid(self,img,height,width):
+
+        if len(bboxes) == 0:
+            return [],[],[]
+
+        return bboxes ,landmarks, scores
+
+    def build_scale_pyramid(self, img, height, width):
         infos = []
         min_length = min(height, width)
         min_detection_size = 12
@@ -65,37 +73,67 @@ class MTCNN(object):
         if info.shape[0] == 0:
             return info
         nms_idx = tf.image.non_max_suppression(info[:, 0:4], info[:, 4], self.max_nms_output_num,
-                                            iou_threshold=0.5)
+                                               iou_threshold=0.5)
         info = tf.gather(info, nms_idx)
         return info
 
     @tf.function(
         input_signature=[tf.TensorSpec(shape=(None, 4), dtype=tf.float32),
-                         tf.TensorSpec(shape=(None,),dtype=tf.float32),
-                         tf.TensorSpec(shape=(None,4),dtype=tf.float32)])
-    def bbox_alignment(self, bboxes,scores,offsets):
+                         tf.TensorSpec(shape=(None, 4), dtype=tf.float32)])
+    def bbox_alignment(self, bboxes, offsets):
         bboxes = calibrate_box(bboxes, offsets)
         bboxes = convert_to_square(bboxes)
-
-        nms_idx = tf.image.non_max_suppression(bboxes, scores, self.max_nms_output_num,
-                                               iou_threshold=self.nms_thresholds[0])
-        bboxes = tf.gather(bboxes, nms_idx)
         return bboxes
+
+    @tf.function(input_signature=[tf.TensorSpec(shape=(None, 4), dtype=tf.float32),
+                                  tf.TensorSpec(shape=(None, 4), dtype=tf.float32),
+                                  tf.TensorSpec(shape=(None, 10), dtype=tf.float32)])
+    def landmark_alignment(self,bboxes,offsets,landmarks):
+        x1, y1, x2, y2 = [bboxes[:, i] for i in range(4)]
+        w = x2 - x1
+        h = y2 - y1
+
+
+        translation = tf.stack([w, h, w, h], 1) * offsets
+
+        delta_x1,delta_y1,delta_x2,delta_y2 = [translation[:,i] for i in range(4)]
+
+        landmarks = tf.stack([landmarks[:, 0] * w + x1,
+                              landmarks[:, 1] * h + y1,
+                              landmarks[:, 2] * w + x1,
+                              landmarks[:, 3] * h + y1,
+                              landmarks[:, 4] * w + x1,
+                              landmarks[:, 5] * h + y1,
+                              landmarks[:, 6] * w + x1,
+                              landmarks[:, 7] * h + y1,
+                              landmarks[:, 8] * w + x1,
+                              landmarks[:, 9] * h + y1])
+
+        landmarks = tf.transpose(landmarks)
+
+
+        return landmarks
+
 
     def p_step(self, img):
         img = preprocess(img)
         height, width, _ = img.shape
         img = tf.convert_to_tensor(img, tf.float32)
 
-        infos = self.build_scale_pyramid(img,height, width)
+        infos = self.build_scale_pyramid(img, height, width)
         infos = tf.concat(infos, 0)
 
-        if infos.shape[0]==0:
+        if infos.shape[0] == 0:
             return []
 
         bboxes, scores, offsets = infos[:, :4], infos[:, 4], infos[:, 5:]
-        return self.bbox_alignment(bboxes,scores,offsets)
+        bboxes = self.bbox_alignment(bboxes, offsets)
 
+        nms_idx = tf.image.non_max_suppression(bboxes, scores, self.max_nms_output_num,
+                                               iou_threshold=self.nms_thresholds[0])
+        bboxes = tf.gather(bboxes, nms_idx)
+
+        return bboxes
 
     def r_step(self, img, bboxes):
         img = preprocess(img)
@@ -107,10 +145,44 @@ class MTCNN(object):
 
         bboxes = tf.boolean_mask(bboxes, valid_idx)
 
-        if bboxes.shape[0]== 0:
+        if bboxes.shape[0] == 0:
             return []
 
         offsets = tf.boolean_mask(offsets, valid_idx)
         scores = tf.boolean_mask(probs[:, 1], valid_idx)
 
-        return self.bbox_alignment(bboxes,scores,offsets)
+        bboxes = self.bbox_alignment(bboxes, offsets)
+
+        nms_idx = tf.image.non_max_suppression(bboxes, scores, self.max_nms_output_num,
+                                               iou_threshold=self.nms_thresholds[1])
+        bboxes = tf.gather(bboxes, nms_idx)
+
+        return bboxes
+
+    def o_step(self,img,bboxes):
+        img = preprocess(img)
+        height, width, _ = img.shape
+        num_boxes = bboxes.shape[0]
+        img_boxes = get_image_boxes(bboxes, img, height, width, num_boxes, size=48)
+        probs, offsets,landmarks = self.onet(img_boxes)
+        valid_idx = tf.argmax(probs, axis=-1) == 1
+
+        bboxes = tf.boolean_mask(bboxes, valid_idx)
+
+        if bboxes.shape[0] == 0:
+            return [],[],[]
+
+        offsets = tf.boolean_mask(offsets, valid_idx)
+        scores = tf.boolean_mask(probs[:, 1], valid_idx)
+        landmarks = tf.boolean_mask(landmarks, valid_idx)
+
+        landmarks=self.landmark_alignment(bboxes,offsets,landmarks)
+        bboxes = calibrate_box(bboxes, offsets)
+        nms_idx = tf.image.non_max_suppression(bboxes, scores, self.max_nms_output_num,
+                                               iou_threshold=self.nms_thresholds[2])
+        bboxes = tf.gather(bboxes, nms_idx)
+        landmarks=tf.gather(landmarks,nms_idx)
+        scores=tf.gather(scores,nms_idx)
+
+
+        return bboxes,landmarks,scores
