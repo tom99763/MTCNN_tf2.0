@@ -17,7 +17,7 @@ def red_tf(imgs,net_size):
         'image/encoded': tf.io.FixedLenFeature([], tf.string),
         'image/label': tf.io.FixedLenFeature([], tf.int64),
         'image/roi': tf.io.FixedLenFeature([4], tf.float32),
-        'image/landmark':tf.io.FixedLenFeature([10], tf.float32) #for landmark
+         #'image/landmark':tf.io.FixedLenFeature([10], tf.float32) #for landmark
     }
     def _parse_image_function(example_proto):
 
@@ -28,7 +28,7 @@ def red_tf(imgs,net_size):
     image_batch = []
     label_batch = []
     bbox_batch = []
-    landmark_batch = []
+    #landmark_batch = []
 
     for idx,image_features in enumerate(parsed_image_dataset):
         print(idx)
@@ -46,8 +46,8 @@ def red_tf(imgs,net_size):
         roi = tf.cast(image_features['image/roi'], tf.float32)
         bbox_batch.append(roi)
 
-        landmark= tf.cast(image_features['image/landmark'], tf.float32)
-        landmark_batch.append(landmark)
+        #landmark= tf.cast(image_features['image/landmark'], tf.float32)
+        #landmark_batch.append(landmark)
 
 
-    return image_batch,label_batch,bbox_batch,landmark_batch
+    return image_batch,label_batch,bbox_batch #,landmark_batch
