@@ -37,7 +37,6 @@ def red_tf(imgs,net_size):
         images = tf.reshape(image_raw, [net_size, net_size, 3])
         image = (tf.cast(images, tf.float32) - 127.5) / 128
 
-        image = image_color_distort(image)
         image_batch.append(image)
 
         label = tf.cast(image_features['image/label'], tf.float32)
