@@ -1,7 +1,6 @@
 import tensorflow as tf
 
 
-#img data augmentation trick
 def image_color_distort(inputs):
     inputs = tf.image.random_contrast(inputs, lower=0.5, upper=1.5)
     inputs = tf.image.random_brightness(inputs, max_delta=0.2)
@@ -10,16 +9,15 @@ def image_color_distort(inputs):
     return inputs
 
 
-
 def red_tf(imgs,net_size):
     print(11)
     raw_image_dataset = tf.data.TFRecordDataset(imgs).shuffle(1000)
-
+    print(raw_image_dataset)
     image_feature_description = {
         'image/encoded': tf.io.FixedLenFeature([], tf.string),
         'image/label': tf.io.FixedLenFeature([], tf.int64),
         'image/roi': tf.io.FixedLenFeature([4], tf.float32),
-        #'image/roi': tf.io.FixedLenFeature([14], tf.float32) #14 is for onet data length
+        'image/landmark':tf.io.FixedLenFeature([10], tf.float32) #for landmark
     }
     def _parse_image_function(example_proto):
 
@@ -30,6 +28,7 @@ def red_tf(imgs,net_size):
     image_batch = []
     label_batch = []
     bbox_batch = []
+    landmark_batch = []
 
     for idx,image_features in enumerate(parsed_image_dataset):
         print(idx)
@@ -47,5 +46,8 @@ def red_tf(imgs,net_size):
         roi = tf.cast(image_features['image/roi'], tf.float32)
         bbox_batch.append(roi)
 
+        landmark= tf.cast(image_features['image/landmark'], tf.float32)
+        landmark_batch.append(landmark)
 
-    return image_batch,label_batch,bbox_batch
+
+    return image_batch,label_batch,bbox_batch,landmark_batch
