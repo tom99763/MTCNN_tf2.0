@@ -19,6 +19,7 @@ def red_tf(imgs,net_size):
         'image/encoded': tf.io.FixedLenFeature([], tf.string),
         'image/label': tf.io.FixedLenFeature([], tf.int64),
         'image/roi': tf.io.FixedLenFeature([4], tf.float32),
+        #'image/roi': tf.io.FixedLenFeature([14], tf.float32) #14 is for onet data length
     }
     def _parse_image_function(example_proto):
 
