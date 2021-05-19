@@ -1,9 +1,11 @@
 import tensorflow as tf
 import tensorflow.keras as keras
-from read_tfrecord import 
+from read_tfrecord import *
 from loss_function import cls_ohem,bbox_ohem,landmark_ohem
 from model import Onet
 from tqdm import tqdm
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 data_path = "../data/preprocessing/48/train_ONet_landmark.tfrecord_shuffle"
 batch_size = 64
@@ -16,7 +18,7 @@ def load_ds():
 
     size = 48
     print(1)
-    images,labels,boxes = red_tf(data_path,size) #preprocessing normalize....
+    images,labels,boxes,landmarks = red_tf(data_path,size) #preprocessing normalize....
 
     print(3)
     ima = tf.data.Dataset.from_tensor_slices(images)
@@ -25,8 +27,10 @@ def load_ds():
     print(5)
     roi = tf.data.Dataset.from_tensor_slices(boxes)
     print(6)
-    train_data = tf.data.Dataset.zip((ima, lab, roi)).shuffle(120000).batch(batch_size)
+    land= tf.data.Dataset.from_tensor_slices(landmarks)
     print(7)
+    train_data = tf.data.Dataset.zip((ima, lab, roi,land)).shuffle(120000).batch(batch_size)
+    print(8)
     train_data = list(train_data.as_numpy_iterator())
     return train_data
 
@@ -43,13 +47,12 @@ def train(eopch):
 
     for epoch in tqdm(range(eopch)):
 
-        for i,(img,lab,boxes) in enumerate(ds_train):
-
+        for i,(img,lab,boxes,landmark) in enumerate(ds_train):
             with tf.GradientTape() as tape:
                 cls_prob, bbox_pred,landmark_pred = model(img)
                 cls_loss = cls_ohem(cls_prob, lab)
-                bbox_loss = bbox_ohem(bbox_pred, boxes[:,4],lab)
-                landmark_loss = landmark_ohem(landmark_pred, boxes[4:], lab)
+                bbox_loss = bbox_ohem(bbox_pred, boxes,lab)
+                landmark_loss = landmark_ohem(landmark_pred, landmark, lab)
                 total_loss_value = cls_loss + 0.5 * bbox_loss+ landmark_loss
 
             grads = tape.gradient(total_loss_value, model.trainable_variables)
