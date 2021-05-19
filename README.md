@@ -45,7 +45,7 @@
 
 
 ### ONet Output Result
-![ONet_output_boxes](./test_imgs/gsw3_result_onet.jpg)
+![ONet_output_boxes](./test_imgs/gsw3_result_output.jpg)
 
 
 
