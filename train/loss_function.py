@@ -11,6 +11,8 @@ def cls_ohem(cls_prob, label):
 
     Returns:
     '''
+    if -2 in label:
+        label=tf.where(label==-2,1,label)
 
     zeros = tf.zeros_like(label, dtype=tf.float32)
 
@@ -57,6 +59,9 @@ def cls_ohem(cls_prob, label):
 
 
 def bbox_ohem(bbox_pred,bbox_target,label):
+
+    if -2 in label:
+        label=tf.where(label==-2,1,label)
 
     zeros_index = tf.zeros_like(label,dtype=tf.float32)
     ones_index = tf.ones_like(label,dtype=tf.float32)
@@ -111,4 +116,19 @@ def landmark_ohem(landmark_pred,landmark_target,label):
 
 
 
+def cal_accuracy(cls_prob,label):
 
+
+    pred = tf.argmax(cls_prob,axis=1)
+    label_int = tf.cast(label,tf.int64)
+
+
+    cond = tf.where(tf.greater_equal(label_int,0))
+    picked = tf.squeeze(cond)
+
+    label_picked = tf.gather(label_int,picked)
+
+    pred_picked = tf.gather(pred,picked)
+
+
+    return label_picked,pred_picked
