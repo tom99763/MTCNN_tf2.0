@@ -79,8 +79,8 @@ def _convert_to_example_simple(image_example, image_buffer):
 
     bbox = image_example['bbox']
     roi = [bbox['xmin'], bbox['ymin'], bbox['xmax'], bbox['ymax']]
-    # landmark = [bbox['xlefteye'],bbox['ylefteye'],bbox['xrighteye'],bbox['yrighteye'],bbox['xnose'],bbox['ynose'],
-    #             bbox['xleftmouth'],bbox['yleftmouth'],bbox['xrightmouth'],bbox['yrightmouth']]
+    landmark = [bbox['xlefteye'],bbox['ylefteye'],bbox['xrighteye'],bbox['yrighteye'],bbox['xnose'],bbox['ynose'],
+                bbox['xleftmouth'],bbox['yleftmouth'],bbox['xrightmouth'],bbox['yrightmouth']]
 
     # 壓縮 {name:壓縮的資料,...}
     #tf.train.Example:封装一筆data
@@ -88,7 +88,7 @@ def _convert_to_example_simple(image_example, image_buffer):
         'image/encoded': _bytes_feature(image_buffer),
         'image/label': _int64_feature(class_label),
         'image/roi': _float_feature(roi),
-        # 'image/landmark': _float_feature(landmark)
+        'image/landmark': _float_feature(landmark)
     }))
 
     return example
