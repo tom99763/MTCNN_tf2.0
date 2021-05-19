@@ -4,8 +4,7 @@ from read_tfrecord import *
 from loss_function import cls_ohem,bbox_ohem,landmark_ohem
 from model import Onet
 from tqdm import tqdm
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 
 data_path = "../data/preprocessing/48/train_ONet_landmark.tfrecord_shuffle"
 batch_size = 64
