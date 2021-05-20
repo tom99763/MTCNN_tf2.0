@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 data_path = "../data/preprocessing/48/train_ONet_landmark.tfrecord_shuffle"
 batch_size = 64
-lr=1e-4
+lr=1e-3
 #model_save='./Weights/onet_weights_file/onet_weights'
 model_save=None
 epochs = 20
