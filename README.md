@@ -38,16 +38,16 @@
 
 
 ### PNet Output Result
-
+![pnet](./test_imgs/gsw3_result_pnet.jpg)
 
 
 ### RNet Output Result
-
+![rnet](./test_imgs/gsw3_result_rnet.jpg)
 
 
 
 ### ONet Output Result
-
+![onet](./test_imgs/gsw3_result_output.jpg)
 
 
 
