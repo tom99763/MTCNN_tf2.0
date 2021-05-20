@@ -58,5 +58,5 @@ def train(eopch):
 
     model.save_weights('./Weights/pnet_weights_file/pnet_weights')
 
-train(10)
+train(5)
 
