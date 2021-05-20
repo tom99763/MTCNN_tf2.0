@@ -49,5 +49,9 @@
 ### ONet Output Result
 ![onet](./test_imgs/gsw3_result_output.jpg)
 
+### Video Test
+
+yt : https://www.youtube.com/watch?v=D5SlXduGc34
+
 
 
