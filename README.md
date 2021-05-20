@@ -32,7 +32,9 @@
     
     * 我自己的意見 : Train RNet不用一定要PNet的output
     
-    * Note : 我只train了 100000:100000:300000個data, 因為我的computer受不了
+    * 我只train了 100000:100000:300000個data, 因為我的computer受不了
+
+    * small tips: each epoch do data augmentation when pick a batch of img 
 
 
 ### PNet Output Result
