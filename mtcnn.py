@@ -6,9 +6,9 @@ from box_utils import calibrate_box, convert_to_square, get_image_boxes, generat
 class MTCNN(object):
     def __init__(self, pnet_path=None, rnet_path=None, onet_path=None,
                  min_face_size=20.0,
-                 thresholds=[0.6, 0.6, 0.6],
-                 nms_thresholds=[0.6, 0.4, 0.2],
-                 max_nms_output_num=500,
+                 thresholds=[0.5, 0.5, 0.5],
+                 nms_thresholds=[0.6, 0.4, 0.05],
+                 max_nms_output_num=300,
                  scale_factor=0.707):  # 0.707 is empirical, no theory proof
         self.pnet = Pnet()
         if pnet_path:
@@ -86,17 +86,11 @@ class MTCNN(object):
         return bboxes
 
     @tf.function(input_signature=[tf.TensorSpec(shape=(None, 4), dtype=tf.float32),
-                                  tf.TensorSpec(shape=(None, 4), dtype=tf.float32),
                                   tf.TensorSpec(shape=(None, 10), dtype=tf.float32)])
-    def landmark_alignment(self,bboxes,offsets,landmarks):
+    def landmark_alignment(self,bboxes,landmarks):
         x1, y1, x2, y2 = [bboxes[:, i] for i in range(4)]
         w = x2 - x1
         h = y2 - y1
-
-
-        translation = tf.stack([w, h, w, h], 1) * offsets
-
-        delta_x1,delta_y1,delta_x2,delta_y2 = [translation[:,i] for i in range(4)]
 
         landmarks = tf.stack([landmarks[:, 0] * w + x1,
                               landmarks[:, 1] * h + y1,
@@ -110,7 +104,6 @@ class MTCNN(object):
                               landmarks[:, 9] * h + y1])
 
         landmarks = tf.transpose(landmarks)
-
 
         return landmarks
 
@@ -165,7 +158,7 @@ class MTCNN(object):
         num_boxes = bboxes.shape[0]
         img_boxes = get_image_boxes(bboxes, img, height, width, num_boxes, size=48)
         probs, offsets,landmarks = self.onet(img_boxes)
-        valid_idx = tf.argmax(probs, axis=-1) == 1
+        valid_idx =probs[:, 1] > self.thresholds[-1]
 
         bboxes = tf.boolean_mask(bboxes, valid_idx)
 
@@ -176,7 +169,7 @@ class MTCNN(object):
         scores = tf.boolean_mask(probs[:, 1], valid_idx)
         landmarks = tf.boolean_mask(landmarks, valid_idx)
 
-        landmarks=self.landmark_alignment(bboxes,offsets,landmarks)
+        landmarks = self.landmark_alignment(bboxes, landmarks)
         bboxes = calibrate_box(bboxes, offsets)
         nms_idx = tf.image.non_max_suppression(bboxes, scores, self.max_nms_output_num,
                                                iou_threshold=self.nms_thresholds[2])
