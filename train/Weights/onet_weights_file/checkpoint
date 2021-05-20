@@ -1,2 +1,0 @@
-model_checkpoint_path: "onet_weights"
-all_model_checkpoint_paths: "onet_weights"
