@@ -1,0 +1,2 @@
+model_checkpoint_path: "rnet_weights"
+all_model_checkpoint_paths: "rnet_weights"
