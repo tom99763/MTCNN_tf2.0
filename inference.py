@@ -35,8 +35,6 @@ def video_show(video=None, output=None,mtcnn=None):
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         out = cv2.VideoWriter(output, fourcc, fps, (w, h))
 
-    frames = 0
-    i = 0
     while True:
         _, img = vid.read()
         if img is None:
@@ -45,15 +43,14 @@ def video_show(video=None, output=None,mtcnn=None):
             bboxes, landmarks, scores = mtcnn(img)
         except:
             out.write(img)
-        frames += 1
+            continue
         img = draw_faces(img, bboxes, landmarks, scores)
 
-        cv2.imshow('demo', img)
+        cv2.imshow('show', img)
         if out is not None:
             out.write(img)
         if cv2.waitKey(1) & 0xFF in [27, ord('q')]:
             break
-        i += 1
     cv2.destroyAllWindows()
 
 
