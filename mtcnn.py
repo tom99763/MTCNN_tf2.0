@@ -29,11 +29,11 @@ class MTCNN(object):
         bboxes = self.p_step(img)
 
         if len(bboxes) == 0:
-            return []
+            return [],[],[]
         bboxes = self.r_step(img, bboxes)
 
         if len(bboxes) == 0:
-            return []
+            return [],[],[]
 
         bboxes,landmarks,scores = self.o_step(img,bboxes)
 
