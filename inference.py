@@ -41,11 +41,14 @@ def video_show(video=None, output=None,mtcnn=None):
         _, img = vid.read()
         if img is None:
             break
-        bboxes, landmarks, scores = mtcnn(img)
+        try:
+            bboxes, landmarks, scores = mtcnn(img)
+        except:
+            out.write(img)
         frames += 1
         img = draw_faces(img, bboxes, landmarks, scores)
 
-        #cv2.imshow('demo', img)
+        cv2.imshow('demo', img)
         if out is not None:
             out.write(img)
         if cv2.waitKey(1) & 0xFF in [27, ord('q')]:
@@ -60,8 +63,8 @@ rnet_weights_path='./train/Weights/rnet_weights_file/rnet_weights'
 onet_weights_path='./train/Weights/onet_weights_file/onet_weights'
 mtcnn=MTCNN(pnet_path=pnet_weights_path,rnet_path=rnet_weights_path,onet_path=onet_weights_path)
 
-video_path='./test/warriors_vs_memphis.mp4'
-video_show(video_path,'test/warriors_vs_memphis_detect.mp4',mtcnn)
+video_path='./test/andrew_wiggins.mp4'
+video_show(video_path,'test/andrew_wiggins_res.mp4',mtcnn)
 
 
 
