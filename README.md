@@ -12,6 +12,8 @@
     
     * cnn cascade structure : https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Li_A_Convolutional_Neural_2015_CVPR_paper.pdf
 
+    * adverserial attack : https://arxiv.org/pdf/1910.06261.pdf
+
 
 ### Dataset
 
