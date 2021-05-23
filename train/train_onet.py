@@ -44,7 +44,7 @@ def train(eopch):
 
     ds_train=load_ds()
 
-    for epoch in tqdm(range(eopch)):
+    for epoch in tqdm(range(epochs)):
 
         for i,(img,lab,boxes,landmark) in enumerate(ds_train):
             img = image_color_distort(img)
